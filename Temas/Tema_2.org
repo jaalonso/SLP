@@ -169,7 +169,8 @@
   + Reconoce las teorías de Isabelle por su extensión (~.thy~). 
   + Procesa las teorías de forma síncrona.
 
-+ Demo: [[./Ejemplos/Introduccion.thy][Introduccion.thy]].
++ Teoría con ejemplos: [[./Ejemplos/Introduccion.thy][Introduccion.thy]].
+  #+INCLUDE: "./Ejemplos/Introduccion.thy"
   + Comentarios 
   + Inferencia de tipo 
   + Evaluación de términos 
