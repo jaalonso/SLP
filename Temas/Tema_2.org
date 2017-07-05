@@ -170,7 +170,6 @@
   + Procesa las teorías de forma síncrona.
 
 + Teoría con ejemplos: [[./Ejemplos/Introduccion.thy][Introduccion.thy]].
-  #+INCLUDE: "./Ejemplos/Introduccion.thy"
   + Comentarios 
   + Inferencia de tipo 
   + Evaluación de términos 
@@ -179,56 +178,77 @@
 
 ** Los tipos bool, nat y list
 
-+ El tipo ~bool~
-  + ~bool~ es el tipo de los booleanos
-  + Está definido por \\
-    ~datatype bool = True | False~
-  + Funciones predefinidas: \\
-    ~∧, ∨, →, ... :: bool ⇒ bool ⇒ bool~
-  + Las *fórmulas* son los términos de tipo ~bool~.
-  + El bicondicional es ~=~.   
+*** El tipo ~bool~
+  
++ ~bool~ es el tipo de los booleanos
+  
++ Está definido por \\
+  ~datatype bool = True | False~
+  
++ Funciones predefinidas: \\
+  ~∧, ∨, →, ... :: bool ⇒ bool ⇒ bool~
+  
++ Las *fórmulas* son los términos de tipo ~bool~.
+  
++ El bicondicional es ~=~.   
 
-+ El tipo ~nat~
-  + ~nat~ es el tipo de los números naturales.
-  + Está definido por \\
-    ~datatype nat = 0 | Suc nat~
-  + Ejemplos de valores de tipo ~nat~
-    ~0, Suc 0, Suc (Suc 0), ...~
-  + Funciones predefinidas \\
-    ~+, ∗, ... :: nat ⇒ nat ⇒ nat~    
-  + Los números y las operaciones aritméticas están sobrecargadas: \\
++ Teoría con ejemplos: [[./Ejemplos/Booleanos.thy][Booleanos.thy]].
+
+*** El tipo ~nat~
+  
++ ~nat~ es el tipo de los números naturales.
+  
++ Está definido por \\
+  ~datatype nat = 0 | Suc nat~
+  
++ Ejemplos de valores de tipo ~nat~
+  ~0, Suc 0, Suc (Suc 0), ...~
+  
++ Funciones predefinidas \\
+  ~+, ∗, ... :: nat ⇒ nat ⇒ nat~    
+  
++ Los números y las operaciones aritméticas están sobrecargadas: \\
     + 
       ~0, 1, 2, ... :: 'a~ 
     + 
       ~+ :: 'a ⇒ 'a ⇒ 'a~ 
-  + Para resolver las ambigüedades se usan anotaciones:
+  
++ Para resolver las ambigüedades se usan anotaciones:
     ~1::nat, x + (y::nat)~
-  + Demo: [[./Ejemplos/Naturales.thy][Naturales.thy]].
-    + Ejemplo de definición recursiva sobre los naturales: suma.
-    + Ejemplo de demostración pos inducción sobre los naturales. 
+  
++ Demo: [[./Ejemplos/Naturales.thy][Naturales.thy]].
+  + Ejemplo de definición recursiva sobre los naturales: suma.
+  + Ejemplo de demostración pos inducción sobre los naturales. 
  
-+ El tipo ~list~
-  + 'a list es el tipo de las listas con elementos de tipo 'a.
-  + Está definido por \\
-    ~datatype 'a list = Nil | Cons 'a ('a list)~
-  + Ejemplos listas: 
-    ~Nil, Cons 1 Nil, Cons 1 (Cons 2 Nil), ...~
-  + Azúcar sintáctica:
-    + ~[]~ es una abreviatura de ~Nil~ (la lista vacía).
-    + ~x#xs~ es una abreviatura de ~Cons x xs~ (la lista cuyo primer elemento
-      es ~x~ y su resto es ~xs~).
-    + ~[x1,...,xn]~ es una abreviatura de ~x1 # (x2 #...# (xn # []))~ (la lista
-      cuyos elementos son ~x1~, ..., ~xn~).
-    + Esquema de inducción sobre listas: Para probar que todas las listas
-      cumplen una propiedad P, basta probar que
-      + P([])
-      + si P(xs) entonces P(x#xs), para todos x, xs.
-    + Demo: [[./Ejemplos/Listas.thy][Listas.thy]].
-      + El tipo de las listas.
-      + Funciones sobre listas: conc e inversa.
-      + Ejemplo de búqueda descendente de la demostración de 
-        "inversa (inversa xs) = xs".
-    + Funciones predefinidas sobre listas: ~length~, ~@~, ~rev~, ~map~, ...
+*** El tipo ~list~
+  
++ 'a list es el tipo de las listas con elementos de tipo 'a.
+  
++ Está definido por \\
+  ~datatype 'a list = Nil | Cons 'a ('a list)~
+  
++ Ejemplos listas: 
+  ~Nil, Cons 1 Nil, Cons 1 (Cons 2 Nil), ...~
+  
++ Azúcar sintáctica:
+  + ~[]~ es una abreviatura de ~Nil~ (la lista vacía).
+  + ~x#xs~ es una abreviatura de ~Cons x xs~ (la lista cuyo primer elemento
+    es ~x~ y su resto es ~xs~).
+  + ~[x1,...,xn]~ es una abreviatura de ~x1 # (x2 #...# (xn # []))~ (la lista
+    cuyos elementos son ~x1~, ..., ~xn~).
+    
++ Esquema de inducción sobre listas: Para probar que todas las listas
+  cumplen una propiedad P, basta probar que
+  + P([])
+  + si P(xs) entonces P(x#xs), para todos x, xs.
+    
++ Demo: [[./Ejemplos/Listas.thy][Listas.thy]].
+  + El tipo de las listas.
+  + Funciones sobre listas: conc e inversa.
+  + Ejemplo de búqueda descendente de la demostración de 
+    "inversa (inversa xs) = xs".
+    
++ Funciones predefinidas sobre listas: ~length~, ~@~, ~rev~, ~map~, ...
 
 ** Tipos numéricos
 
