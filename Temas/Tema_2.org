@@ -1,0 +1,585 @@
+#+TITLE: Tema 2: Programación y demostración
+#+LANGUAGE: es
+
+* Contenido                                                        :TOC_2_gh:
+ - [[#visión-panorámica-de-isabellehol][Visión panorámica de Isabelle/HOL]]
+   - [[#hol-lógica-de-orden-superior][HOL: Lógica de orden superior]]
+   - [[#tipos-y-términos-][Tipos y términos ]]
+   - [[#los-tipos-bool-nat-y-list][Los tipos bool, nat y list]]
+   - [[#tipos-numéricos][Tipos numéricos]]
+   - [[#resumen][Resumen]]
+   - [[#1-relación-de-ejercicios-r01solthy][1ª relación de ejercicios (R01Sol.thy):]]
+ - [[#definiciones-de-tipos-y-funciones][Definiciones de tipos y funciones]]
+   - [[#definiciones-de-tipos][Definiciones de tipos]]
+   - [[#definiciones-de-funciones][Definiciones de funciones]]
+ - [[#heurísticas-y-esquemas-de-inducción][Heurísticas y esquemas de inducción]]
+   - [[#heurísticas-de-inducción][Heurísticas de inducción]]
+   - [[#esquemas-de-inducción][Esquemas de inducción]]
+ - [[#simplificación][Simplificación]]
+   - [[#reglas-de-simplificación][Reglas de simplificación]]
+   - [[#ejemplos-de-simplificación][Ejemplos de simplificación]]
+   - [[#método-de-simplificación-simp][Método de simplificación (/simp/)]]
+   - [[#reescritura-condicional][Reescritura condicional:]]
+   - [[#reescritura-con-definiciones][Reescritura con definiciones]]
+   - [[#distinción-de-casos][Distinción de casos]]
+   - [[#comparación-de-auto-y-simp][Comparación de /auto/ y /simp/]]
+   - [[#terminación][Terminación]]
+   - [[#2-relación-de-ejercicios-r02solthy][2ª relación de ejercicios (R02Sol.thy):]]
+
+* Visión panorámica de Isabelle/HOL
+
+** HOL: Lógica de orden superior
+
++ Las siglas HOL (del inglés, /Higher-Order Logic/) significa "Lógica de orden
+  superior". 
+
++ Ecuación fundamental de HOL:
+  + HOL = Programación funcional + Lógica
+
++ HOL, como lenguaje de programación, dispone de
+  + operadores lógicos
+  + funciones recursivas
+  + funciones de orden superior
+  + tipos de datos
+
++ Fórmulas de HOL:
+  + Inicialmente sólo consideraremos ecuaciones de la forma ~t = s~ donde ~t~ y
+    ~s~ son términos.
+  + Más adelante se añadirán conectivas y cuantificadores.
+
+** Tipos y términos 
+
+*** Tipos
+
++ Sintaxis de tipos
+  : τ ::= (τ)
+  :     | bool | nat | int ...    tipos básicos 
+  :     | 'a | 'b | ...           variables de tipos
+  :     | τ ⇒ τ                   funciones
+  :     | τ × τ                   pares (en ASCII: *)
+  :     | τ list                  listas
+  :     | τ set                   conjuntos
+  :     | ...                     tipos definidos por el usuario
+
++ Convenio: τ₁ ⇒ τ₂ ⇒ τ₃ es una abreviatura de τ₁ ⇒ (τ₂ ⇒ τ₃)  
+
+*** Términos
+
++ Sintaxis de términos (del lambda cálculo)
+  : t ::= (t)
+  :     | a       constante o variable 
+  :     | t t     aplicación de funciones
+  :     | λx. t   abstracción de funciones
+  :     | ...     azúcar sintática
+
++ Ejemplos de términos: 
+  + f (g x) y
+  + h (λx. f (g x))
+
++ Convenio: f t₁ t₂ t₃ es una abreviatura de ((f t₁) t₂) t₃
+
+*** Beta reducción
+
++ El lenguaje de los términos se conoce como *λ-cálculo*
+
++ La regla de computación del λ-cálculo es la *beta reducción*:
+  + ~(λ x. t) u = t[u/x]~
+  donde ~t[u/x]~ es el término obtenido sustituyendo en ~t~ las variables ~x~
+  por el término~u~.
+
++ Ejemplo: ~(λx. x + 5) 3 = 3 + 5
+
++ Nota: Isabelle aplica las beta reducciones automáticamente.
+
+*** Tipado de términos
+  
++ Todos los términos tienen un tipos.
+  
++ Notación:
+    ~t :: τ~ significa que "el tipo de ~t~ es ~τ~
+
+*** Inferencia de tipo:
+  
++ Regla de tipos para aplicaciones
+  : t :: τ₁ ⇒ τ₂    u :: τ₁
+  : ——————————————————————–
+  :        t u :: t₂
+  
++ Isabelle automáticamente calcula el tipo de las variables de los
+  términos. Esto se llama *inferencia de tipos*.
+  
++ A veces no es posible por la presencia de funciones /sobrecargadas/. 
+  
++ Las ambigüedades se resuelven con *anotaciones de tipo*. Por ejemplo, 
+  ~f (x::nat)~. 
+
+*** Currificación:
+  
++ Definición curryficada 
+  ~f :: τ₁ ⇒ τ₂ ⇒ τ~ 
+  
++ Definición cartesiana 
+  ~g :: τ₁ × τ₂ ⇒ τ~ 
+
++ Ventaja de las definiciones currificadas: admiten aplicaciones parciales. Por
+  ejemplo, ~f a₁ :: τ₂ ⇒ τ~ para cada ~a₁ :: τ₁~
+
+*** Azúcar sintáctica
+  
++ Operadores infijos:
+  ~+, -, *, #, @, ...~
+  
++ Operadores mixfijos:
+  ~if _ then _ else _, case _ of, ...~
+  
++ Los prefijos tienen prioridad sobre los infijos
+  + ~f x + y ≡ (f x) + y~
+  + ~f x + y ≢ f (x + y)~
+  
++ Las expresiones con ~if~ o ~case~ se tienen que escribir entre paréntesis.
+
+*** Teorías de Isabelle
+  
++ Las teorías de Isabelle son análogas a los módulos de Haskell.
+  
++ La sintaxis de una teoría de Isabelle es
+  : theory T
+  : imports T₁ ... Tₙ
+  : begin
+  : (definiciones, teoremas. demostraciones, ...)*
+  : end
+  + ~T~ es el nombre de la teoría (y el nombre de su fichero tiene que ser
+    ~T.thy~)
+  + ~T₁, ..., Tₙ~ son la teorías importadas.
+  + La importación de toerías es transitiva.
+  + El cuerpo de la teoría se compone de definiciones,
+    teoremas. demostraciones, ... 
+  
++ Usualmente importaremos sólo la teoría ~Main~.
+
+*** Sintaxis concreta:
+  
++ En la teorías se tiene que escribir entre dobles comillas los tipos, los
+  términos y las fórmulas.
+  
++ Una posible excepción son los identificadores simples.
+
++ El entorno jEdit
+  + El editor de Isabelle está construido sobre jEdit.
+  + Reconoce las teorías de Isabelle por su extensión (~.thy~). 
+  + Procesa las teorías de forma síncrona.
+
++ Demo: [[./Ejemplos/Introduccion.thy][Introduccion.thy]].
+  + Comentarios 
+  + Inferencia de tipo 
+  + Evaluación de términos 
+  + Ejemplos de sobrecarga 
+  + Ejemplos de errores de tipo 
+
+** Los tipos bool, nat y list
+
++ El tipo ~bool~
+  + ~bool~ es el tipo de los booleanos
+  + Está definido por \\
+    ~datatype bool = True | False~
+  + Funciones predefinidas: \\
+    ~∧, ∨, →, ... :: bool ⇒ bool ⇒ bool~
+  + Las *fórmulas* son los términos de tipo ~bool~.
+  + El bicondicional es ~=~.   
+
++ El tipo ~nat~
+  + ~nat~ es el tipo de los números naturales.
+  + Está definido por \\
+    ~datatype nat = 0 | Suc nat~
+  + Ejemplos de valores de tipo ~nat~
+    ~0, Suc 0, Suc (Suc 0), ...~
+  + Funciones predefinidas \\
+    ~+, ∗, ... :: nat ⇒ nat ⇒ nat~    
+  + Los números y las operaciones aritméticas están sobrecargadas: \\
+    + 
+      ~0, 1, 2, ... :: 'a~ 
+    + 
+      ~+ :: 'a ⇒ 'a ⇒ 'a~ 
+  + Para resolver las ambigüedades se usan anotaciones:
+    ~1::nat, x + (y::nat)~
+  + Demo: [[./Ejemplos/Naturales.thy][Naturales.thy]].
+    + Ejemplo de definición recursiva sobre los naturales: suma.
+    + Ejemplo de demostración pos inducción sobre los naturales. 
+ 
++ El tipo ~list~
+  + 'a list es el tipo de las listas con elementos de tipo 'a.
+  + Está definido por \\
+    ~datatype 'a list = Nil | Cons 'a ('a list)~
+  + Ejemplos listas: 
+    ~Nil, Cons 1 Nil, Cons 1 (Cons 2 Nil), ...~
+  + Azúcar sintáctica:
+    + ~[]~ es una abreviatura de ~Nil~ (la lista vacía).
+    + ~x#xs~ es una abreviatura de ~Cons x xs~ (la lista cuyo primer elemento
+      es ~x~ y su resto es ~xs~).
+    + ~[x1,...,xn]~ es una abreviatura de ~x1 # (x2 #...# (xn # []))~ (la lista
+      cuyos elementos son ~x1~, ..., ~xn~).
+    + Esquema de inducción sobre listas: Para probar que todas las listas
+      cumplen una propiedad P, basta probar que
+      + P([])
+      + si P(xs) entonces P(x#xs), para todos x, xs.
+    + Demo: [[./Ejemplos/Listas.thy][Listas.thy]].
+      + El tipo de las listas.
+      + Funciones sobre listas: conc e inversa.
+      + Ejemplo de búqueda descendente de la demostración de 
+        "inversa (inversa xs) = xs".
+    + Funciones predefinidas sobre listas: ~length~, ~@~, ~rev~, ~map~, ...
+
+** Tipos numéricos
+
++ Tipos numéricos: nat, int, real
+  + nat es el tipo de los números naturales.
+  + int es el tipo de los números enteros.
+  + real es el tipo de los números reales.
+
++ Funciones de conversión de tipo:
+  #+BEGIN_EXAMPLE
+  int         :: nat ⇒ int
+  real        :: nat ⇒ real
+  real_of_int :: int ⇒ real
+  nat         :: int ⇒ nat
+  floor       :: real ⇒ int
+  ceiling     :: real ⇒ int
+  #+END_EXAMPLE
+
++ Para usar los números reales se necesita importar la teoría ~Complex_Main~ en
+  lugar de ~Main~.
+
++ Isabelle, con ~Complex_Main~, convierte los tipos automáticamente. Por
+  ejemplo, \\
+  "(3::int) + (2::nat)"  da "5" :: "int" 
+
++ Operaciones aritméticas
+  + Las operaciones aritméticas están sobrecargadas.
+  + Operaciones básicas:
+    + binarias:
+      ~+, −, ∗ :: 'a ⇒ 'a ⇒ 'a~
+    + monaria:
+      ~− :: 'a ⇒ 'a~
+  + División para ~nat~ e ~int~:
+    ~div, mod :: 'a ⇒ 'a ⇒ 'a~
+  + División para ~real~: 
+    ~/ :: 'a ⇒ 'a ⇒ 'a~
+  + Potencia: 
+    ~ˆ :: 'a ⇒ nat ⇒ 'a~
+  + Exponenciación: 
+    ~powr :: 'a ⇒ 'a ⇒ 'a~
+  + Valor absoluto: 
+    ~abs :: 'a ⇒ 'a~
+    
+** Resumen
+
++ Definiciones de tipos y de funciones:
+  + *datatype* se usa para definir tipos de datos (posiblemente recursivos). 
+  + *fun* se usa para definir funciones (posiblemente recursivas y con
+    patrones sobre los constructores).
+
++ Métodos de demostración:
+  + *(induction x)* aplica inducción estructural sobre la variable x cuyo tipo
+    es recursivo.
+  + *simp* aplica simplificaciones al objetivo actual.
+  + *auto* aplica simplificaciones (y algunas otras transformaciones) a todos
+    los objetivos.
+
++ Enunciado de propiedades:
+  + *lemma* nombre: "..."
+  + *lemma* nombre [simp]: "..."
+
++ Esquema general de pruebas:
+  #+BEGIN_EXAMPLE
+  lemma nombre: "..."
+  apply (...)
+  apply (...)
+  ...
+  done
+  #+END_EXAMPLE
+
++ Finales de pruebas:
+  + *done* para terminar la demostración
+  + *oops* para abandonar la demostración
+  + *sorry* para abandonar la demostración pero pudiendo usar el lema y
+    demostrarlo posteriormente.
+
++ Los estados de prueba son de la forma
+  | ⋀x1 ... xp. A ⟹ B  |
+  donde
+  | x1, ..., xp | son las variables locales |
+  | A           | son los supuestos locales |
+  | B           | es el subobjetivo actual  |
+ 
++ Supuestos múltiples
+  |〚 A₁ ; ... ; Aₙ 〛 ⟹ B | 
+  es una abreviatura de  
+  | A₁ ⟹ ... ⟹ Aₙ ⟹ B |
+
+** 1ª relación de ejercicios ([[../Ejercicios/R01Sol.thy][R01Sol.thy]]):
++ Cálculo con números naturales.
++ Propiedades de los números naturales.
++ Ocurrencias de un elemento en una lista.
++ Añadiendo los elementos al final de la lista e inversa.
+
+* Definiciones de tipos y funciones
+
+** Definiciones de tipos
+
++ Definiciones con datatype
+  + El caso general de datatype es
+    : datatype (α(1),...,α(n))t = C1 τ(1,1) ...τ(1,n(1))
+    :                           | ...
+    :                           | Ck τ(k,1) ...τ(k,n(k))
+  + El tipo de los constructores es
+    : C(i) :: τ(i,1) ⇒ ... ⇒ τ(i,n(i)) ⇒ (α(1),...,α(n))t
+  + Los valores de los constructores son disjuntos: \\ 
+    Si i ≠ j, entonces ~C(i) ... ≠ C(j) ...~
+  + Los constructores son inyectivos:
+    : (C(i) x1 ,,, x n = C(i) y1 ... yn) = 
+    : (x1 = y1 ∧ ... xn = yn) 
+  + Las definiciones de tipos recursivos con datatype genera reglas de
+    inducción. 
+
++ Expresiones case
+  + El caso general de expresiones case es
+    : (case t of pat(1) ⇒ t(1) | ... | pat(n) ⇒ t(n))
+  + Los paréntesis externos son obligatorios,
+  + Si los patrones son complicados, también lo son las demostraciones
+   
++ Demo: [[./Ejemplos/Arboles.thy][Arboles.thy]].
+  + Definición del tipo de datos de árboles 
+  + Demostración de propiedades de árboles   
+  + Ejemplo de función recursiva no primitiva recursiva 
+
++ El tipo ~option~
+  * Su definición es
+    : datatype 'a option = None | Some 'a
+  * Es análogo al tipo ~Maybe~ de Haskell.
+  * Ejemplo de uso ([[./Ejemplos/Opcionales.thy][Opcionales.thy]]): \\
+    ~(busca ps x)~ es el segundo elemento del primer par de ps cuyo
+    primer elemento es x y None si ningún elemento de ps tiene un primer
+    elemento igual a x. Por ejemplo,
+    :      busca [(1::int,2::int),(3,6)] 3 = Some 6
+    :      busca [(1::int,2::int),(3,6)] 2 = None
+    Definición:
+    : fun busca :: "('a × 'b) list ⇒ 'a ⇒ 'b option"
+    : where
+    :   "busca [] x           = None" 
+    : | "busca ((a,b) # ps) x = (if a = x 
+    :                             then Some b 
+    :                             else busca ps x)"
+
+** Definiciones de funciones
+
++ Definiciones no recursivas con *definition*
+  + Ejemplo ([[./Ejemplos/Cuadrado.thy][Cuadrado.thy]]): ~(cuadrado x)~ es el cuadrado de x. Por ejemplo,
+    ~cuadrado 3 = 9~
+    : definition cuadrado :: "int ⇒ int"
+    : where
+    :   "cuadrado n = n*n"
+  + No se admiten patrones del tipo ~f x1 ... xn = ...~
+  + No se admiten funciones que no terminan. Por ejemplo, ~f x = f x + 1~.
+
++ Definiciones generales con *fun*
+  + Rasgos de ~fun~:
+    + Admite patrones sobre los constructores de los tipos de datos.
+    + Importa el orden de las ecuaciones.
+    + Hay que demostrar la terminación.
+    + Genera esquemas de inducción.
+  + Ejemplo: ([[./Ejemplos/Intercala.thy][Intercala.thy]]): ~(intercala x ys)~ es la lista obtenida
+    intercalando x entre los elementos de ys. Por ejemplo, 
+    ~intercala a [x,y,z] = [x, a, y, a, z]~
+    : fun intercala :: "'a ⇒ 'a list ⇒ 'a list" 
+    : where
+    :   "intercala a []       = []" 
+    : | "intercala a [x]      = [x]" 
+    : | "intercala a (x#y#zs) = x # a # intercala a (y#zs)"
+
++ Definiciones primitivas recursivas con *primrec*
+  + ~primrec~ es una restricción de ~fun~ para funciones
+    [[https://es.wikipedia.org/wiki/Recursión_primitiva][primitivas recursivas]].
+  + Para los naturales, el patrón es
+    : f(0,x1,...,xk)     = g(x1,...,xk) 
+    : f(Suc n,x1,...,xk) = h(f(n,x1,...,xk),n,x1,...,xk)
+  + Para las listas, el patrón es
+    : f([],x1,...,xk)   = g(x1,...,xk) 
+    : f(x#xs,x1,...,xk) = h(f(xs,x1,...,xk),x,x1,...,xk)
+
+* Heurísticas y esquemas de inducción
+
+** Heurísticas de inducción
++ 1ª heurística: Las propiedades de las funciones recursivas se demuestran
+  por inducción.
++ 2ª heurística: La prueba por inducción de una propiedad de la función f es
+  sobre el i-ésimo argumento de f si f esrá definida por recursión en el
+  argumento i.
++ 3ª heurística: Generalizar las propiedades:
+  + Sustituir constantes por variables.
+  + Generalizar las variables libres:
+    + usando ~arbitrary~ en demostraciones por inducción
+    + usando cuantificadores universales en la fórmula 
++ Ejemplo: [[./Ejemplos/Induccion.thy][Induccion.thy]]
+
+** Esquemas de inducción
++ Hasta ahora la inducción ha sido simple porque correspondía a funciones
+  primitivas recursivas.
+  + Se añade un constructor en cada ecuación de la inducción.
+  + Se elimina un constructor en cada paso de la recursión.
++ Ejemplo general
+  + (mitad x) es la mitad del número natural x. Por ejemplo,  
+    : mitad (Suc (Suc (Suc (Suc 0)))) = Suc (Suc 0) 
+    : mitad (Suc (Suc (Suc 0)))       = Suc 0
+    su definición es 
+    : fun mitad :: "nat ⇒ nat" 
+    : where
+    :   "mitad 0             = 0" 
+    : | "mitad (Suc 0)       = 0" 
+    : | "mitad (Suc (Suc n)) = 1 + mitad n"
+  + El esquema de inducción correspondiente a la función mitad es
+    : ⟦P 0; P (Suc 0); ⋀n. P n ⟹ P (Suc (Suc n))⟧ ⟹ P a
+    es decir, para demostrar que todo número a tiene la propiedad P basta
+    demostrar que:
+    + 0 tiene la propiedad P
+    + (Suc 0) tiene la propiedad P
+    + si n tiene la propiedad P, entonces (Suc (Suc n)) también la tiene.
+    Su nombre es ~mitad.induct~
+  + Ejemplo de demostración por inducción general:
+    : lemma "2 * mitad n ≤ n"
+    : apply (induction n rule: mitad.induct)
+    : apply auto
+    : done
++ Ejemplo: [[./Ejemplos/InduccionGeneral.thy][InduccionGeneral.thy]].
+
+* Simplificación
+
+** Reglas de simplificación
+
++ La regla de simplificación correspondiente a la ecuación ~i = d~ consiste
+  en reemplazar ~i~ por ~d~.
+
++ A veces, se usa /regla de reescritura/ en lugar de regla de
+  simplificación y /reescritura/ en lugar de simplificación.
+
+** Ejemplos de simplificación
+
++ Se consideran las siguientes reglas: 
+  : 1. 0 + n           = n
+  : 2. (Suc m) + n     = Suc (m + n)
+  : 3. (Suc m ≤ Suc n) = (m ≤ n)
+  : 4. (0 ≤ m)         = True
+
++ La simplificación de ~0 + Suc 0 ≤ (Suc 0) + x~ con las reglas anteriores es 
+  :   0 + Suc 0 ≤ (Suc 0) + x
+  : = Suc 0 ≤ (Suc 0) + x        [por 1]
+  : = Suc 0 ≤ Suc (0 + x)        [por 2]
+  : = 0 ≤ 0 + x                  [por 3]
+  : = True                       [por 4]
+
+** Método de simplificación (/simp/)
+
++ El efecto de ~apply (simp add: ec1 ... ecn)~ sobre el objetivo 
+  ~〚 P1; ...; Pk 〛⟹ C~ es la simplificación de ~P1~, ..., ~Pk~ y ~C~ usando
+  + los lemas con atributo /simp/
+  + las reglas correspondientes a *fun* y *datatype*
+  + las reglas correspondientes a las ecuaciones ~ec1~, ..., ~ecn~
+  + los supuestos ~P1~, ..., ~Pk~
+
++ El efecto de ~apply (simp del: ec1 ... ecn)~ es análogo salvo que no se
+  aplica las reglas de simplificación correspondientes a las ecuaciones  ~ec1~,
+  ..., ~ecn~ 
+
++ Ejemplos: [[./Ejemplos/Simplificacion1.thy][Simplificacion1.thy]]
+ 
+** Reescritura condicional:
+
++ La forma de las reglas de reescritura condicional es \\
+  ~〚 P1; ...; Pk 〛⟹ i = d~
+
++ Una regla de reescritura condicional es aplicable sólo si se han demostrado
+  sus condiciones. 
+
++ Ejemplo: con las reglas 
+  : p(0) = True
+  : p(x) ⟹ f(x) = g(x)
+  + se puede simplificar f(0) a g(0)
+  + no se puede simplificar f(1) a g(1)
+
++ Ejemplos: [[./Ejemplos/Simplificacion2.thy][Simplificacion2.thy]]
+
+** Reescritura con definiciones
+
++ Para aplicar la definición de una función ~f~ definida con *definition* es
+  necesario añadir su regla de simplificación: \\
+  ~(simp add: f_def ...)~
+
++ Ejemplos: [[./Ejemplos/Simplificacion3.thy][Simplificacion3.thy]]
+
+** Distinción de casos
+
++ Expresiones con /if/
+  + Las expresiones con /if/ se simplifican automáticamente.
+  + Por ejemplo, 
+    + ~P (if A then s else t)~ 
+    se simplifica a 
+    + ~(A ⟶ P s) ∧ (¬A ⟶ P t)~
+
++ Expresiones con /case/
+  + Las expresiones con /case/ no se simplifican automáticamente.
+  + Por ejemplo, para simplificar
+    + ~P (case e of 0 ⇒ a | Suc n ⇒ b)~
+    se necesita aplicar ~simp split: nat.split~ y se obtiene 
+    + ~(e = 0 ⟶ P(a)) ∧ (∀ n. e = Suc n ⟶ P(b))~
+  + Análogamente, para un tipo de dato ~t~ se usa ~t.split~
+
++ Expresiones con pares
+  + Para simplificar 
+    + ~P (case t of (x, y) ⇒ u x y)~
+    se necesita aplicar ~simp split: prod.split~ y se obtiene 
+    + ~∀ x y. t = (x, y) ⟶ P (u x y)~
+
++ Expresiones con pares y let
+  + Para simplificar 
+    + ~P (let (x, y) = t in u x y)~
+    se necesita aplicar ~simp split: prod.split~ y se obtiene 
+    + ~∀ x y. t = (x, y) ⟶ P (u x y)~
+
++ Ejemplos: [[./Ejemplos/Simplificacion4.thy][Simplificacion4.thy]]
+
+** Comparación de /auto/ y /simp/
+
++ /simp/ se aplica sólo al primer subobjetivo y /auto/ a todos.
++ /auto/ aplica /simp/ y más.
++ /auto/ se puede modificar:
+  ~(auto simp add: ... del: ...)~
+
+** Terminación
+
++ La simplificación puede no terminar.
+
++ Ejemplo: Con las reglas 
+  + f(x) = g(x)
+  + g(x) = f(x)
+  la simplificación de f(0) no termina.
+
++ Isabelle aplica casi ciegamente las reglas de simplificación.
+
++ Una regla condicional
+  + ~〚 P1; ...; Pk 〛⟹ i = d~
+  es aceptable como regla de simplificación si ~i~ es "mayor" que ~d~ y que cada
+  una de ls condiciones ~Pi~
+
++ Ejemplos: 
+  + ~n < m ⟹ (n < Suc m) = True~ es aceptable
+  + ~Suc n < m ⟹ (n < m) = True~ no es aceptable
+
++ Ejemplo [[./Ejemplos/Simplificacion.thy][Simplificacion.thy]]
+
+** 2ª relación de ejercicios ([[../Ejercicios/R01Sol.thy][R02Sol.thy]]):
++ Plegados sobre árboles.
++ Alineamientos de lista.
++ Plegado de listas.
++ Lista con elementos distintos.  
++ Plegados de listas por la derecha y por la izquierda.
++ Cortes de listas.
+

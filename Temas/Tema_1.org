@@ -1,0 +1,25 @@
+#+TITLE: Tema 1: Introducción
+#+LANGUAGE: es
+
++ Objetivos fundamentales de la primera parte:
+  + aprender a escribir programas funcionales en Isabelle/HOL
+  + aprender a probar propiedades de programas funcionales con Isabelle/HOL. 
+
++ Objetivos complementarios:
+  + aprender a razonar formalmente
+  + aprender el uso del razonamiento asitido por ordenador en ciencia de la
+    computación. 
+ 
++ El papel de los asistentes de demostración:
+  + el humano escribe la estructura de las pruebas
+  + el asistente comprueba la corrección de cada paso.
+
++ Advertencias sobre el uso de los asistentes de prueba:
+  + Requiere más tiempo que las demostraciones informales.
+  + Puede ser adictivo.
+  + Mina la confianza en las demostraciones informales.
+
++ Verificaciones destacadas:
+  + [[http://compcert.inria.fr/doc/][Verificación de un compilador de C]]. Por [[http://pauillac.inria.fr/~xleroy/][Xavier Leroy]] con [[https://coq.inria.fr/][Coq]].
+  + [[http://ts.data61.csiro.au/projects/TS/l4.verified/][Verificación del núcleo de un sistema operativo (L4)]]. Por [[http://www.cse.unsw.edu.au/~kleing/][Gerwin Klein]] con
+    [[http://www.cl.cam.ac.uk/research/hvg/Isabelle/index.html][Isabelle/HOL]]. 

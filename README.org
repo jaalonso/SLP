@@ -1,0 +1,13 @@
+#+TITLE: Semánticas de lenguajes de programación en Isabelle/HOL (SLP)
+#+OPTIONS: toc:nil 
+
+El presente trabajo es una adaptación del libro de T. Nipkow y G. Klein
+[[http://www.concrete-semantics.org/][Concrete Semantics with Isabelle/HOL]] y su curso [[http://www21.in.tum.de/teaching/semantik/WS1617/][Semantics of Programming
+Languages (2016/17)]] con vista a su uso en la próxima edición del curso de
+[[https://www.cs.us.es/~jalonso/cursos/m-ra-16/][Razonamiento automático]] del [[http://master.cs.us.es/M%C3%A1ster_Universitario_en_L%C3%B3gica,_Computaci%C3%B3n_e_Inteligencia_Artificial][Máster Universitario en Lógica, Computación e
+Inteligencia Artificial]] de la Universidad de Sevilla.
+
+* Primera parte: Isabelle
++ [[./Temas/Tema01.org][Tema 1: Introducción]].
++ [[./Temas/Tema_2.org][Tema 2: Programación y demostración]].
+
