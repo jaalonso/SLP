@@ -169,7 +169,7 @@
   + Reconoce las teorías de Isabelle por su extensión (~.thy~). 
   + Procesa las teorías de forma síncrona.
 
-+ Teoría con ejemplos: [[./Ejemplos/Introduccion.thy][Introduccion.thy]].
++ Demo: [[./Ejemplos/Introduccion.thy][Introduccion.thy]].
   + Comentarios 
   + Inferencia de tipo 
   + Evaluación de términos 
@@ -192,7 +192,12 @@
   
 + El bicondicional es ~=~.   
 
-+ Teoría con ejemplos: [[./Ejemplos/Booleanos.thy][Booleanos.thy]].
++ Demo: [[./Ejemplos/Booleanos.thy][Booleanos.thy]].
+  + Ejemplo de cálculo con booleanos
+  + Ejemplo de definición no recursiva con *definition*
+  + Ejemplo de definición con patrones usando *fun*
+  + Ejemplo de demostración por simplificación
+  + Ejemplo de exportación a Haskell con *export_code*
 
 *** El tipo ~nat~
   
@@ -207,6 +212,11 @@
 + Funciones predefinidas \\
   ~+, ∗, ... :: nat ⇒ nat ⇒ nat~    
   
++ Demo: [[./Ejemplos/Naturales.thy][Naturales.thy]].
+  + Ejemplo de cálculo con los naturales.
+  + Ejemplo de definición recursiva sobre los naturales: suma.
+  + Ejemplo de demostración por inducción sobre los naturales. 
+
 + Los números y las operaciones aritméticas están sobrecargadas: \\
     + 
       ~0, 1, 2, ... :: 'a~ 
@@ -215,11 +225,7 @@
   
 + Para resolver las ambigüedades se usan anotaciones:
     ~1::nat, x + (y::nat)~
-  
-+ Demo: [[./Ejemplos/Naturales.thy][Naturales.thy]].
-  + Ejemplo de definición recursiva sobre los naturales: suma.
-  + Ejemplo de demostración pos inducción sobre los naturales. 
- 
+   
 *** El tipo ~list~
   
 + 'a list es el tipo de las listas con elementos de tipo 'a.
