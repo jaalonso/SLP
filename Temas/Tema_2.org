@@ -209,8 +209,11 @@
 + Ejemplos de valores de tipo ~nat~
   ~0, Suc 0, Suc (Suc 0), ...~
   
-+ Funciones predefinidas \\
-  ~+, ∗, ... :: nat ⇒ nat ⇒ nat~    
++ Funciones predefinidas 
+  + Ejemplos: 
+    ~+, ∗, ... :: nat ⇒ nat ⇒ nat~    
+  + Se puede ver la relación completa en la sección "Nat" de [[http://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2016-1/doc/main.pdf][What’s in Main]] 
+  + Se pueden ver las definiciones y propiedades en la teoría [[http://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/library/HOL/HOL/Nat.html][Nat.thy]].
   
 + Demo: [[./Ejemplos/Naturales.thy][Naturales.thy]].
   + Ejemplo de cálculo con los naturales.
@@ -231,7 +234,7 @@
 + 'a list es el tipo de las listas con elementos de tipo 'a.
   
 + Está definido por \\
-  ~datatype 'a list = Nil | Cons 'a ('a list)~
+  ~datatype 'a list = Nil | Cons 'a "'a list"~
   
 + Ejemplos listas: 
   ~Nil, Cons 1 Nil, Cons 1 (Cons 2 Nil), ...~
@@ -243,19 +246,23 @@
   + ~[x1,...,xn]~ es una abreviatura de ~x1 # (x2 #...# (xn # []))~ (la lista
     cuyos elementos son ~x1~, ..., ~xn~).
     
-+ Esquema de inducción sobre listas: Para probar que todas las listas
-  cumplen una propiedad P, basta probar que
-  + P([])
-  + si P(xs) entonces P(x#xs), para todos x, xs.
-    
++ Funciones predefinidas sobre listas: 
+  + Ejemplos de funciones predefinidas ~length~, ~@~, ~rev~, ~map~, ...
+  + Se puede ver la relación completa en la sección "List" de [[http://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2016-1/doc/main.pdf][What’s in Main]] 
+  + Se pueden ver las definiciones y propiedades en la teoría [[http://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/library/HOL/HOL/List.html][List.thy]].
+
 + Demo: [[./Ejemplos/Listas.thy][Listas.thy]].
   + El tipo de las listas.
   + Funciones sobre listas: conc e inversa.
   + Ejemplo de búqueda descendente de la demostración de 
     "inversa (inversa xs) = xs".
-    
-+ Funciones predefinidas sobre listas: ~length~, ~@~, ~rev~, ~map~, ...
+  + Ejemplo de funciones predefinidas sobre listas.
 
++ Esquema de inducción sobre listas: Para probar que todas las listas
+  cumplen una propiedad P, basta probar que
+  + P([])
+  + si P(xs) entonces P(x#xs), para todos x, xs.
+    
 ** Tipos numéricos
 
 + Tipos numéricos: nat, int, real
