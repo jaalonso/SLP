@@ -1,4 +1,4 @@
-theory R01Sol
+theory EjT2A
 
 imports Main
 begin
@@ -7,7 +7,7 @@ text {* Relación 1 *}
 
 text {* 
   ----------------------------------------------------------------------
-  Ejercicio 1. [Cálculo con números naturales]
+  Ejercicio 2.1. [Cálculo con números naturales]
   Calcular el valor de las siguientes expresiones con números naturales:
   + 2 + (2::nat)
   + 2 + (2::int)
@@ -33,7 +33,7 @@ value "(3::int) * 4 - 2 * (7 + 1)"
   
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 2.1 [Propiedades de los números naturales]
+  Ejercicio 2.2.1 [Propiedades de los números naturales]
   Usando la siguiente definición de suma de números naturales
      fun suma :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
        "suma 0 n = n" 
@@ -53,7 +53,7 @@ done
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 2.2. Demostrar que la suma de los naturales es conmutativa.
+  Ejercicio 2.2.2. Demostrar que la suma de los naturales es conmutativa.
   ------------------------------------------------------------------- *}
 
 text {* 1\<ordfeminine> intento *}  
@@ -107,7 +107,7 @@ by (induction x) (simp_all add: suma_0 suma_1)
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 2.3. Definir, por inducción,
+  Ejercicio 2.2.3. Definir, por inducción,
      fun doble :: "nat \<Rightarrow> nat" 
   tal que (doble n) es el doble de n. Por ejemplo,
      doble 3 = 6
@@ -124,7 +124,7 @@ lemma "doble 3 = 6" by normalization
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 2.4. Demostrar que
+  Ejercicio 2.2.4. Demostrar que
      doble x = suma x x
   ------------------------------------------------------------------- *}
 
@@ -143,7 +143,7 @@ by (induction x) (simp_all add: suma_0 suma_1)
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 3.1. [Ocurrencias de un elemento en una lista]
+  Ejercicio 2.3.1. [Ocurrencias de un elemento en una lista]
   Definir la función
      cuenta :: "'a list \<Rightarrow> 'a \<Rightarrow> nat"
   tal que (cuenta xs y) es el número de ocurrencia de y en xs. Por
@@ -171,7 +171,7 @@ value "cuenta [] (3::nat)"
 
 text{*
   ----------------------------------------------------------------------
-  Ejercicio 3.2. Demostrar que el número de ocurrencia de cualquier
+  Ejercicio 2.3.2. Demostrar que el número de ocurrencia de cualquier
   elemento en una lista es menor o igual que la longitud de la lista. 
   ------------------------------------------------------------------- *}
 
@@ -182,7 +182,7 @@ done
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.1. [Añadiendo los elementos al final de la lista e inversa]
+  Ejercicio 2.4.1. [Añadiendo los elementos al final de la lista e inversa]
   Definir, por recursión, la función
      snoc :: "'a list \<Rightarrow> 'a \<Rightarrow> 'a list"
   tal que (snoc xs y) es la lista obtenida añadiendo y al final de xs.
@@ -202,7 +202,7 @@ by simp
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.2. Definir, sin recursión, la función
+  Ejercicio 2.4.2. Definir, sin recursión, la función
      snoc2 :: "'a list \<Rightarrow> 'a \<Rightarrow> 'a list"
   tal que (snoc2 xs y) es la lista obtenida añadiendo y al final de xs.
   Por ejemplo, 
@@ -219,7 +219,7 @@ lemma "snoc2 [3,5,2] (7::int) = [3, 5, 2, 7]" by normalization
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.3. Demostrar que las funciones snoc y snoc2 son
+  Ejercicio 2.4.3. Demostrar que las funciones snoc y snoc2 son
   equivalentes.
   ------------------------------------------------------------------- *}
 
@@ -231,7 +231,7 @@ done
   
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.4. Definir, por recursión, la función
+  Ejercicio 2.4.4. Definir, por recursión, la función
      inversa :: "'a list \<Rightarrow> 'a list"
   tal que (inversa xs) es la lista obtenida invirtiendo el orden de los
   elementos de xs. Por ejemplo,
@@ -249,7 +249,7 @@ by simp
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.5. Demostrar que 
+  Ejercicio 2.4.5. Demostrar que 
      inversa (inversa xs) = xs"
   Nota: Se necesita un lema relacionando las funciones inversa y snoc.   
   ------------------------------------------------------------------- *}
@@ -278,7 +278,7 @@ by (induct xs) (auto simp add: inversa_snoc)
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.6. Definir la función 
+  Ejercicio 2.4.6. Definir la función 
      inversa_it :: "'a list \<Rightarrow> 'a list"
   tal que (inversa_it xs) es la inversa de xs calculada con un
   acumulador. Por ejemplo,
@@ -298,7 +298,7 @@ lemma "inversa_it [a,b,c] = [c, b, a]" by simp
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.7. Demostrar que
+  Ejercicio 2.4.7. Demostrar que
      inversa_it (inversa_it xs) = xs"
   ------------------------------------------------------------------- *}
 
@@ -311,7 +311,7 @@ by (simp add: inversa_it_aux_lemma)
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.8. Demostrar que las funciones inversa y rev son
+  Ejercicio 2.4.8. Demostrar que las funciones inversa y rev son
   equivalentes.
   ------------------------------------------------------------------- *}
 
@@ -324,7 +324,7 @@ done
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.9. Buscar los teoremas de la forma
+  Ejercicio 2.4.9. Buscar los teoremas de la forma
      rev (rev _) = _
   ------------------------------------------------------------------- *}
 
@@ -335,7 +335,7 @@ find_theorems "rev (rev _) = _"
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.10. Demostrar, usando el teorema encontrado en el apartado
+  Ejercicio 2.4.10. Demostrar, usando el teorema encontrado en el apartado
   anterior, que  
      inversa (inversa xs) = xs"
   ------------------------------------------------------------------- *}
@@ -372,7 +372,7 @@ done
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 5.1. [Suma de los primeros números naturales]
+  Ejercicio 2.5.1. [Suma de los primeros números naturales]
   Definir la función
      suma_hasta :: "nat \<Rightarrow> nat" where
   tal que (suma_hasta n) es la suma de los números naturales hasta n.
@@ -388,7 +388,7 @@ lemma "suma_hasta 3 = 6" by normalization
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 5.2. Demostrar que
+  Ejercicio 2.5.2. Demostrar que
      suma_hasta n = n * (n + 1) div 2
   ------------------------------------------------------------------- *}
 

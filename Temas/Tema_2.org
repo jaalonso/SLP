@@ -8,13 +8,14 @@
    - [[#los-tipos-bool-nat-y-list][Los tipos bool, nat y list]]
    - [[#tipos-numéricos][Tipos numéricos]]
    - [[#resumen][Resumen]]
-   - [[#1-relación-de-ejercicios-r01solthy][1ª relación de ejercicios (R01Sol.thy):]]
+   - [[#relación-de-ejercicios-ejt2athy][Relación de ejercicios (EjT2A.thy):]]
  - [[#definiciones-de-tipos-y-funciones][Definiciones de tipos y funciones]]
    - [[#definiciones-de-tipos][Definiciones de tipos]]
    - [[#definiciones-de-funciones][Definiciones de funciones]]
- - [[#heurísticas-y-esquemas-de-inducción][Heurísticas y esquemas de inducción]]
-   - [[#heurísticas-de-inducción][Heurísticas de inducción]]
+ - [[#demostraciones-por-inducción][Demostraciones por inducción]]
+   - [[#inducción-primitiva][Inducción primitiva]]
    - [[#esquemas-de-inducción][Esquemas de inducción]]
+   - [[#relación-de-ejercicios-ejt2bthy][Relación de ejercicios (EjT2B.thy):]]
  - [[#simplificación][Simplificación]]
    - [[#reglas-de-simplificación][Reglas de simplificación]]
    - [[#ejemplos-de-simplificación][Ejemplos de simplificación]]
@@ -350,7 +351,7 @@
   es una abreviatura de  
   | A₁ ⟹ ... ⟹ Aₙ ⟹ B |
 
-** 1ª relación de ejercicios ([[../Ejercicios/R01Sol.thy][R01Sol.thy]]):
+** Relación de ejercicios ([[../Ejercicios/EjT2A.thy][EjT2A.thy]]):
 + Cálculo con números naturales.
 + Propiedades de los números naturales.
 + Ocurrencias de un elemento en una lista.
@@ -361,22 +362,33 @@
 
 ** Definiciones de tipos
 
-+ Definiciones con datatype
-  + El caso general de datatype es
-    : datatype (α(1),...,α(n))t = C1 τ(1,1) ...τ(1,n(1))
-    :                           | ...
-    :                           | Ck τ(k,1) ...τ(k,n(k))
-  + El tipo de los constructores es
-    : C(i) :: τ(i,1) ⇒ ... ⇒ τ(i,n(i)) ⇒ (α(1),...,α(n))t
-  + Los valores de los constructores son disjuntos: \\ 
-    Si i ≠ j, entonces ~C(i) ... ≠ C(j) ...~
-  + Los constructores son inyectivos:
-    : (C(i) x1 ,,, x n = C(i) y1 ... yn) = 
-    : (x1 = y1 ∧ ... xn = yn) 
-  + Las definiciones de tipos recursivos con datatype genera reglas de
-    inducción. 
+*** Tipos sinónimos con ~type_synonym~
 
-+ Expresiones case
++ Ejemplo de definición de tipos sinónimos:
+  + ~type_synonym string = "char list"~
+
+*** Definiciones de tipos con ~datatype~
+
++ El caso general de datatype es
+  : datatype (α(1),...,α(n))t = C1 "τ(1,1)" ... "τ(1,n(1))"
+  :                           | ...
+  :                           | Ck "τ(k,1)" ... "τ(k,n(k))"
+
++ El tipo de los constructores es
+  : C(i) :: τ(i,1) ⇒ ... ⇒ τ(i,n(i)) ⇒ (α(1),...,α(n))t
+
++ Los valores de los constructores son disjuntos: \\ 
+  Si i ≠ j, entonces ~C(i) ... ≠ C(j) ...~
+
++ Los constructores son inyectivos:
+  : (C(i) x1 ,,, x n = C(i) y1 ... yn) = 
+  : (x1 = y1 ∧ ... xn = yn) 
+
++ Las definiciones de tipos recursivos con datatype genera reglas de
+  inducción. 
+
++ Se pueden definir expresiones ~case~ con los tipo definidos con ~datatype~:
+  + Ejemplo: ~(case xs of [] ⇒ 0 | x # _ ⇒ Suc x )~
   + El caso general de expresiones case es
     : (case t of pat(1) ⇒ t(1) | ... | pat(n) ⇒ t(n))
   + Los paréntesis externos son obligatorios,
@@ -407,60 +419,83 @@
 
 ** Definiciones de funciones
 
-+ Definiciones no recursivas con *definition*
-  + Ejemplo ([[./Ejemplos/Cuadrado.thy][Cuadrado.thy]]): ~(cuadrado x)~ es el cuadrado de x. Por ejemplo,
-    ~cuadrado 3 = 9~
-    : definition cuadrado :: "int ⇒ int"
-    : where
-    :   "cuadrado n = n*n"
-  + No se admiten patrones del tipo ~f x1 ... xn = ...~
-  + No se admiten funciones que no terminan. Por ejemplo, ~f x = f x + 1~.
+*** Definiciones no recursivas con *definition*
 
-+ Definiciones generales con *fun*
-  + Rasgos de ~fun~:
-    + Admite patrones sobre los constructores de los tipos de datos.
-    + Importa el orden de las ecuaciones.
-    + Hay que demostrar la terminación.
-    + Genera esquemas de inducción.
-  + Ejemplo: ([[./Ejemplos/Intercala.thy][Intercala.thy]]): ~(intercala x ys)~ es la lista obtenida
-    intercalando x entre los elementos de ys. Por ejemplo, 
-    ~intercala a [x,y,z] = [x, a, y, a, z]~
-    : fun intercala :: "'a ⇒ 'a list ⇒ 'a list" 
-    : where
-    :   "intercala a []       = []" 
-    : | "intercala a [x]      = [x]" 
-    : | "intercala a (x#y#zs) = x # a # intercala a (y#zs)"
++ Ejemplo ([[./Ejemplos/Cuadrado.thy][Cuadrado.thy]]): 
+  + ~(cuadrado x)~ es el cuadrado de x. Por ejemplo, ~cuadrado 3 = 9~
+  : definition cuadrado :: "int ⇒ int" where
+  :   "cuadrado n = n*n"
+  + No se expande automáticamente
+  : lemma "cuadrado 3 = 9" by (simp add: cuadrado_def)  
 
-+ Definiciones primitivas recursivas con *primrec*
-  + ~primrec~ es una restricción de ~fun~ para funciones
-    [[https://es.wikipedia.org/wiki/Recursión_primitiva][primitivas recursivas]].
-  + Para los naturales, el patrón es
-    : f(0,x1,...,xk)     = g(x1,...,xk) 
-    : f(Suc n,x1,...,xk) = h(f(n,x1,...,xk),n,x1,...,xk)
-  + Para las listas, el patrón es
-    : f([],x1,...,xk)   = g(x1,...,xk) 
-    : f(x#xs,x1,...,xk) = h(f(xs,x1,...,xk),x,x1,...,xk)
++ No se admiten patrones del tipo ~f x1 ... xn = ...~
 
-* Heurísticas y esquemas de inducción
++ No se admiten funciones que no terminan. Por ejemplo, ~f x = f x + 1~.
 
-** Heurísticas de inducción
-+ 1ª heurística: Las propiedades de las funciones recursivas se demuestran
-  por inducción.
-+ 2ª heurística: La prueba por inducción de una propiedad de la función f es
-  sobre el i-ésimo argumento de f si f esrá definida por recursión en el
-  argumento i.
-+ 3ª heurística: Generalizar las propiedades:
+*** Definiciones de abreviaturas con *abbreviation*
+
++ Ejemplo ([[./Ejemplos/Cuadrado2.thy][Cuadrado2.thy]]): 
+  + ~(cuadrado2 x)~ es el cuadrado de x. Por ejemplo, ~cuadrado2 3 = 9~ 
+  : abbreviation cuadrado2 :: "int ⇒ int" where
+  :  "cuadrado2 n ≡ n*n"
+  + Se expande automáticamente
+  : lemma "cuadrado2 3 = 9" by simp
+
+*** Definiciones recursivas con *fun*
+
++ Rasgos de ~fun~:
+  + Admite patrones sobre los constructores de los tipos de datos.
+  + Importa el orden de las ecuaciones.
+  + Hay que demostrar la terminación.
+  + Genera esquemas de inducción.
+
++ Ejemplo: ([[./Ejemplos/Intercala.thy][Intercala.thy]]): ~(intercala x ys)~ es la lista obtenida
+  intercalando x entre los elementos de ys. Por ejemplo, 
+  ~intercala a [x,y,z] = [x, a, y, a, z]~
+  : fun intercala :: "'a ⇒ 'a list ⇒ 'a list" 
+  : where
+  :   "intercala a []       = []" 
+  : | "intercala a [x]      = [x]" 
+  : | "intercala a (x#y#zs) = x # a # intercala a (y#zs)"
+
+*** Definiciones primitivas recursivas con *primrec*
+
++ ~primrec~ es una restricción de ~fun~ para funciones
+  [[https://es.wikipedia.org/wiki/Recursión_primitiva][primitivas recursivas]].
+
++ Para los naturales, el patrón es
+  : f(0,x1,...,xk)     = g(x1,...,xk) 
+  : f(Suc n,x1,...,xk) = h(f(n,x1,...,xk),n,x1,...,xk)
+
++ Para las listas, el patrón es
+  : f([],x1,...,xk)   = g(x1,...,xk) 
+  : f(x#xs,x1,...,xk) = h(f(xs,x1,...,xk),x,x1,...,xk)
+
+* Demostraciones por inducción
+
+** Inducción primitiva
+
++ Las propiedades de las funciones recursivas se demuestran por inducción.
+
++ La prueba por inducción de una propiedad de la función f es sobre el i-ésimo
+  argumento de f si f esrá definida por recursión en el argumento i.
+
++ Heurística: Generalizar las propiedades:
   + Sustituir constantes por variables.
   + Generalizar las variables libres:
     + usando ~arbitrary~ en demostraciones por inducción
     + usando cuantificadores universales en la fórmula 
 + Ejemplo: [[./Ejemplos/Induccion.thy][Induccion.thy]]
+  + Definiciones de la función inversa.
+  + Equivalencia de las definiciones de inversa.
 
 ** Esquemas de inducción
+
 + Hasta ahora la inducción ha sido simple porque correspondía a funciones
   primitivas recursivas.
   + Se añade un constructor en cada ecuación de la inducción.
   + Se elimina un constructor en cada paso de la recursión.
+
 + Ejemplo general
   + (mitad x) es la mitad del número natural x. Por ejemplo,  
     : mitad (Suc (Suc (Suc (Suc 0)))) = Suc (Suc 0) 
@@ -484,7 +519,16 @@
     : apply (induction n rule: mitad.induct)
     : apply auto
     : done
+
 + Ejemplo: [[./Ejemplos/InduccionGeneral.thy][InduccionGeneral.thy]].
+  + La función mitad.
+  + La función intercala.
+
+** Relación de ejercicios ([[../Ejercicios/EjT2B.thy][EjT2B.thy]]):
+   + Suma de elementos de un árbol.
+   + Recorrido de árboles e imagen especular.
+   + Intercalado de un elemento.
+   + Definición iterativa de suma de naturales
 
 * Simplificación
 
