@@ -35,15 +35,13 @@ text {*
   ----------------------------------------------------------------------
   Ejercicio 2.1 [Propiedades de los números naturales]
   Usando la siguiente definición de suma de números naturales
-     fun suma :: "nat \<Rightarrow> nat \<Rightarrow> nat" 
-     where
+     fun suma :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
        "suma 0 n = n" 
      | "suma (Suc m) n = Suc (suma m n)"
   demostrar que la suma de los naturales es conmutativa.
   ------------------------------------------------------------------- *}
 
-fun suma :: "nat \<Rightarrow> nat \<Rightarrow> nat" 
-where
+fun suma :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
   "suma 0 n = n" 
 | "suma (Suc m) n = Suc (suma m n)"
 
@@ -145,9 +143,8 @@ by (induction x) (simp_all add: suma_0 suma_1)
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 3. [Ocurrencias de un elemento en una lista]
-  
-  Ejercicio 3.1. Definir la función
+  Ejercicio 3.1. [Ocurrencias de un elemento en una lista]
+  Definir la función
      cuenta :: "'a list \<Rightarrow> 'a \<Rightarrow> nat"
   tal que (cuenta xs y) es el número de ocurrencia de y en xs. Por
   ejemplo,   
@@ -163,10 +160,14 @@ fun cuenta :: "'a list \<Rightarrow> 'a \<Rightarrow> nat" where
                         then Suc (cuenta xs y) 
                         else cuenta xs y)"
 
-value "cuenta [3, 2] (4::nat)"
+value "cuenta [3, 2] (4::nat)" 
+  (* da "0" *)
 value "cuenta [3, 2] (3::nat)"
+  (* da "Suc 0" *)
 value "cuenta [3, 3] (3::nat)"
+  (* da "Suc (Suc 0)" *)
 value "cuenta [] (3::nat)"
+  (* da "0" *)
 
 text{*
   ----------------------------------------------------------------------
@@ -181,13 +182,13 @@ done
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4. [Añadiendo los elementos al final de la lista e inversa]
-  
-  Ejercicio 4.1. Definir, por recursión, la función
+  Ejercicio 4.1. [Añadiendo los elementos al final de la lista e inversa]
+  Definir, por recursión, la función
      snoc :: "'a list \<Rightarrow> 'a \<Rightarrow> 'a list"
   tal que (snoc xs y) es la lista obtenida añadiendo y al final de xs.
   Por ejemplo, 
      snoc [3,5,2] 7 = [3,5,2,7]
+  ----------------------------------------------------------------------   
 *}
 
 fun snoc :: "'a list \<Rightarrow> 'a \<Rightarrow> 'a list" where
@@ -195,13 +196,42 @@ fun snoc :: "'a list \<Rightarrow> 'a \<Rightarrow> 'a list" where
 | "snoc (y # ys) x = y # (snoc ys x)" 
 
 value "snoc [3,5,2] (7::int)"
-
+  (* da "[3, 5, 2, 7]" *)
 lemma "snoc [3,5,2] (7::int) = [3,5,2,7]"
 by simp
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.2. Definir, por recursión, la función
+  Ejercicio 4.2. Definir, sin recursión, la función
+     snoc2 :: "'a list \<Rightarrow> 'a \<Rightarrow> 'a list"
+  tal que (snoc2 xs y) es la lista obtenida añadiendo y al final de xs.
+  Por ejemplo, 
+     snoc2 [3,5,2] 7 = [3,5,2,7]
+  ----------------------------------------------------------------------   
+*}
+
+definition snoc2 :: "'a list \<Rightarrow> 'a \<Rightarrow> 'a list" where
+  "snoc2 xs x \<equiv> xs @ [x]"
+
+value "snoc2 [3,5,2] (7::int)"  
+  (* da "[3, 5, 2, 7]" *)
+lemma "snoc2 [3,5,2] (7::int) = [3, 5, 2, 7]" by normalization  
+
+text {*
+  ----------------------------------------------------------------------
+  Ejercicio 4.3. Demostrar que las funciones snoc y snoc2 son
+  equivalentes.
+  ------------------------------------------------------------------- *}
+
+lemma snoc_snoc2:
+  "snoc xs x = snoc2 xs x"
+apply (induction xs)
+apply (simp_all add: snoc2_def)
+done
+  
+text {*
+  ----------------------------------------------------------------------
+  Ejercicio 4.4. Definir, por recursión, la función
      inversa :: "'a list \<Rightarrow> 'a list"
   tal que (inversa xs) es la lista obtenida invirtiendo el orden de los
   elementos de xs. Por ejemplo,
@@ -213,26 +243,42 @@ fun inversa :: "'a list \<Rightarrow> 'a list"  where
 | "inversa (x # xs) = snoc (inversa xs) x" 
 
 value "inversa [a, b, c]"
-
+  (* da "[c, b, a]" *)
 lemma "inversa [a, b, c] = [c, b, a]"
 by simp
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.3. Demostrar que 
+  Ejercicio 4.5. Demostrar que 
      inversa (inversa xs) = xs"
   Nota: Se necesita un lema relacionando las funciones inversa y snoc.   
   ------------------------------------------------------------------- *}
 
-lemma inversa_snoc: "inversa (snoc xs y) = y # inversa xs"
+text {* 1\<ordmasculine> intento *}  
+theorem inversa_inversa_1: 
+  "inversa (inversa xs) = xs"
+apply (induction xs) 
+apply simp
+apply simp
+oops
+  
+text {* Se quda sin demostrar 
+     inversa (inversa xs) = xs \<Longrightarrow> 
+     inversa (snoc (inversa xs) a) = a # xs
+  por lo que se introduce el siguiente lema.   
+*}
+lemma inversa_snoc: 
+  "inversa (snoc xs y) = y # inversa xs"
 by (induct xs) auto
 
-theorem "inversa (inversa xs) = xs"
-by (induct xs) (auto simp suma: inversa_snoc)
+text {* Demostración *}
+theorem inversa_inversa
+  "inversa (inversa xs) = xs"
+by (induct xs) (auto simp add: inversa_snoc)
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.4. Definir la función 
+  Ejercicio 4.6. Definir la función 
      inversa_it :: "'a list \<Rightarrow> 'a list"
   tal que (inversa_it xs) es la inversa de xs calculada con un
   acumulador. Por ejemplo,
@@ -247,10 +293,12 @@ fun inversa_it :: "'a list \<Rightarrow> 'a list" where
 "inversa_it xs = inversa_it_aux [] xs"
 
 value "inversa_it [a,b,c]"
+  (* da "[c, b, a]" *)
+lemma "inversa_it [a,b,c] = [c, b, a]" by simp
 
 text {*
   ----------------------------------------------------------------------
-  Ejercicio 4.5. Demostrar que
+  Ejercicio 4.7. Demostrar que
      inversa_it (inversa_it xs) = xs"
   ------------------------------------------------------------------- *}
 
@@ -259,8 +307,68 @@ lemma inversa_it_aux_lemma:
 by (induct xs) auto
 
 lemma "inversa_it (inversa_it xs) = xs"
-by (simp suma: inversa_it_aux_lemma)
+by (simp add: inversa_it_aux_lemma)
+
+text {*
+  ----------------------------------------------------------------------
+  Ejercicio 4.8. Demostrar que las funciones inversa y rev son
+  equivalentes.
+  ------------------------------------------------------------------- *}
+
+lemma inversa_rev: 
+  "inversa xs = rev xs"
+apply (induction xs)
+apply simp
+apply (simp add: snoc_snoc2 snoc2_def)
+done  
+
+text {*
+  ----------------------------------------------------------------------
+  Ejercicio 4.9. Buscar los teoremas de la forma
+     rev (rev _) = _
+  ------------------------------------------------------------------- *}
+
+find_theorems "rev (rev _) = _"
+  (* Encuentra el teorema
+        List.rev_rev_ident: rev (rev ?xs) = ?xs
+  *)
+
+text {*
+  ----------------------------------------------------------------------
+  Ejercicio 4.10. Demostrar, usando el teorema encontrado en el apartado
+  anterior, que  
+     inversa (inversa xs) = xs"
+  ------------------------------------------------------------------- *}
+  
+lemma "inversa (inversa xs) = xs"
+using [[simp_trace_new mode=full]]
+apply (simp add: inversa_rev)
+done
+
+(* Se puede observar la traza del simplificador:
+  Simplifier invoked 
+  inversa (inversa xs) = xs 
+    Apply rewrite rule? 
+      Instance of R01Sol.inversa_rev: inversa xs \<equiv> rev xs
+      Trying to rewrite: inversa xs 
+        Successfully rewrote 
+          inversa xs \<equiv> rev xs 
+    Apply rewrite rule? 
+      Instance of R01Sol.inversa_rev: inversa (rev xs) \<equiv> rev (rev xs)
+      Trying to rewrite: inversa (rev xs) 
+        Successfully rewrote 
+          inversa (rev xs) \<equiv> rev (rev xs) 
+    Apply rewrite rule? 
+      Instance of List.rev_rev_ident: rev (rev xs) \<equiv> xs
+      Trying to rewrite: rev (rev xs) 
+        Successfully rewrote 
+          rev (rev xs) \<equiv> xs 
+    Apply rewrite rule? 
+      Instance of HOL.simp_thms_6: xs = xs \<equiv> True
+      Trying to rewrite: xs = xs 
+        Successfully rewrote 
+          xs = xs \<equiv> True
+*)
 
 end
-
 
