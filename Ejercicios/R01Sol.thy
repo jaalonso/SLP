@@ -370,5 +370,32 @@ done
           xs = xs \<equiv> True
 *)
 
+text {*
+  ----------------------------------------------------------------------
+  Ejercicio 5.1. [Suma de los primeros números naturales]
+  Definir la función
+     suma_hasta :: "nat \<Rightarrow> nat" where
+  tal que (suma_hasta n) es la suma de los números naturales hasta n.
+  Por ejemplo, 
+     suma_hasta 3 = 6
+  ------------------------------------------------------------------- *}
+
+fun suma_hasta :: "nat \<Rightarrow> nat" where
+  "suma_hasta 0      = 0"
+| "suma_hasta (Suc n) = suma_hasta n + Suc n"  
+  
+lemma "suma_hasta 3 = 6" by normalization
+
+text {*
+  ----------------------------------------------------------------------
+  Ejercicio 5.2. Demostrar que
+     suma_hasta n = n * (n + 1) div 2
+  ------------------------------------------------------------------- *}
+
+lemma "suma_hasta n = n * (n + 1) div 2"
+apply (induction n)
+apply simp_all
+done
+
 end
 

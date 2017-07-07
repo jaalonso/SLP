@@ -355,6 +355,7 @@
 + Propiedades de los números naturales.
 + Ocurrencias de un elemento en una lista.
 + Añadiendo los elementos al final de la lista e inversa.
++ Suma de los primeros números naturales]
 
 * Definiciones de tipos y funciones
 
