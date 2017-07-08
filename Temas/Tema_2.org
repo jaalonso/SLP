@@ -25,7 +25,7 @@
    - [[#distinción-de-casos][Distinción de casos]]
    - [[#comparación-de-auto-y-simp][Comparación de /auto/ y /simp/]]
    - [[#terminación][Terminación]]
-   - [[#2-relación-de-ejercicios-r02solthy][2ª relación de ejercicios (R02Sol.thy):]]
+   - [[#relación-de-ejercicios-ejt2cthy][Relación de ejercicios (EjT2C.thy):]]
 
 * Visión panorámica de Isabelle/HOL
 
@@ -628,7 +628,9 @@
 ** Comparación de /auto/ y /simp/
 
 + /simp/ se aplica sólo al primer subobjetivo y /auto/ a todos.
+
 + /auto/ aplica /simp/ y más.
+
 + /auto/ se puede modificar:
   ~(auto simp add: ... del: ...)~
 
@@ -652,13 +654,13 @@
   + ~n < m ⟹ (n < Suc m) = True~ es aceptable
   + ~Suc n < m ⟹ (n < m) = True~ no es aceptable
 
-+ Ejemplo [[./Ejemplos/Simplificacion.thy][Simplificacion.thy]]
-
-** 2ª relación de ejercicios ([[../Ejercicios/R01Sol.thy][R02Sol.thy]]):
-+ Plegados sobre árboles.
-+ Alineamientos de lista.
-+ Plegado de listas.
-+ Lista con elementos distintos.  
-+ Plegados de listas por la derecha y por la izquierda.
-+ Cortes de listas.
+** Relación de ejercicios ([[../Ejercicios/EjT2C.thy][EjT2C.thy]]):
+   + Número de nodos en copias de árboles binarios.
+   + Expresiones aritméticas y polinomios.
+   + Plegados sobre árboles.
+   + Alineamientos de lista.
+   + Plegado de listas.
+   + Lista con elementos distintos.  
+   + Plegados de listas por la derecha y por la izquierda.
+   + Cortes de listas.
 
