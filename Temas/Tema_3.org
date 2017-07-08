@@ -1,0 +1,211 @@
+#+TITLE: Tema 3: Caso de estudio: Expresiones del lenguaje imperativo IMP 
+#+LANGUAGE: es
+
+* Contenido                                                        :TOC_2_gh:
+ - [[#expresiones-aritméticas-expathy][Expresiones aritméticas (ExpA.thy)]]
+   - [[#sintaxis][Sintaxis]]
+   - [[#semántica][Semántica]]
+   - [[#propagación-de-constantes-][Propagación de constantes ]]
+ - [[#expresiones-booleanas][Expresiones booleanas]]
+ - [[#máquina-a-pila-y-compilación][Máquina a pila y compilación]]
+
+* Expresiones aritméticas ([[./Ejemplos/ExpA.thy][ExpA.thy]])
+
+** Sintaxis
+
+*** Sintaxis concreta y abstracta
+
++ Un lenguaje de programación tiene dos sintaxis: una concreta y otra
+  abstracta. 
+
++ La *sintaxis concreta* se expresa con cadenas. Por ejemplo.  ~"a + 5 * b"~
+
++ La *sintaxis abstracta* se expresa con términos estructurados. Por ejemplo,
+  :      +
+  :     / \
+  :    a   *
+  :       / \
+  :      5   b
+
++ Los *analizadores* transforma la sintaxis concreta en abstracta.
+
++ Usaremos la forma lineal de la sintaxis abstracta. Por ejemplo,
+  ~Suma a (Producto 5 b)~
+
+*** El tipo de datos de las expresiones aritméticas (~expA~)
+
++ Los *nombres de las variables* de las expresiones aritméticas son
+  cadenas y se representan por *~nombreV~*  
+  : type_synonym nombreV = string
+
++ Una *expresión aritmética* (*~expA~*) es un número entero, una
+  variable o la suma de dos expresiones aritméticas. Por ejemplo,
+  : Suma (N 5) (V x1)      :: expA
+  : Suma (N 5) (V ''x 1'') :: expA
+  Se define por 
+  : datatype expA = N int | V nombreV | Suma expA expA
+
++ Ejemplos de sintaxis concreta y abstracta de expresiones aritméticas: 
+  : |-------------+-------------------------------|
+  : | Concreta    | Abstracta                     |
+  : |-------------+-------------------------------|
+  : | 5           | N 5                           |
+  : | x           | V x                           |
+  : | x + y       | Suma (V x) (V y)              |
+  : | 2 + (z + 3) | Suma (N 2) (Suma (V z) (N 3)) |
+  : |-------------+-------------------------------|
+
++ La igualdad entre expresiones aritméticas es sintáctica, no semántica. Por
+  ejemplo, 
+  + ~N 0 = N 0~
+  + ~Suma (N 0) (N 0) ≠ N 0~
+
+** Semántica
+
+*** Valores y estados
+
++ Los *valores* son números enteros y su tipo se representa por ~val~.
+  : type_synonym val = int
+
++ Los *estados* son funciones de los nombres de variables en valores.
+  : type_synonym estado = "nombreV ⇒ val"
+
+*** Valor de una expresión aritmética
+
++ ~(valor e s)~ es el valor de la expresión aritmética ~e~ en el estado
+  ~s~. Por ejemplo,
+  : valorA (Suma (V x) (N 5)) (λy. 0) = 5 
+  : valorA (Suma (V x) (N 5)) (λy. if y = x then 7 else 0) = 12
+  La definición es
+  : fun valorA :: "expA ⇒ estado ⇒ val" where
+  :   "valorA (N n) s          = n" 
+  : | "valorA (V x) s          = s x" 
+  : | "valorA (Suma a⇩1 a⇩2) s = valorA a⇩1 s + valorA a⇩2 s"
+
+*** Actualización de funciones
+
++ ~f (a := b)~ es la función que sólo se diferencia de ~f~ en que el valor de
+  ~a~ es ~b~:
+  : f(a := b) = (λx. if x = a then b else f x)
+
++ El segundo ejemplo de ~valorA~ se puede simplificar
+  : valorA (Suma (V x) (N 5)) ((λx. 0) (x:= 7)) = 12
+
+*** Escritura abreviada de estados 
+
++ ~<x1 := a1, x2 := a2, ..., xn := an>~ es el estado que le asigna a ~x1~ el
+  valor ~a1~, a ~x2~ el valor ~a2~, ..., a ~xn~ el valor ~an~ y a las demás
+  variables el valor 0. Por ejemplo,
+  : <''a'' := 3::int, ''b'' := 2> ''a'' = 3
+  : <''a'' := 3::int, ''b'' := 2> ''b'' = 2
+  : <''a'' := 3::int, ''b'' := 2> ''c'' = 0
+  : <a := 3, b := 2> = (<> (a := 3)) (b := 2) 
+  : <a := 3, b := 2> = ((λx. 0) (a := 3)) (b := 2) 
+  La definición es
+  : definition null_estado ("<>") where
+  :   "null_estado ≡ λx. 0"
+  : syntax 
+  :   "_Estado" :: "updbinds => 'a" ("<_>")
+  : translations
+  :   "_Estado ms" == "_Update <> ms"
+
++ Ejemplos:
+  : valorA (Suma (V ''x'') (N 5)) <''x'' := 7> = 12
+  : valorA (Suma (V ''x'') (N 5)) <''y'' := 7> = 5
+
+** Propagación de constantes 
+
++ La *propagación de constantes* (en inglés, /constant folding/) consiste en la
+  sustitución de las subexpresiones constantes por sus valores. Por ejemplo,
+  ~x + (3 + 1)~ se sustituye por ~x + 4~.
+
++ La propagación de constantes es un ejemplo de *optimización de programas*.
+
++ ~(simp_constA e)~ es la expresión aritmética obtenida aplicando
+  propagación de constantes a la expresión ~e~. Por ejemplo, 
+  : simp_constA (Suma (V ''x'') (Suma (N 3) (N 1))) 
+  :   = Suma (V ''x'') (N 4)
+  : simp_constA (Suma (N 3) (Suma (V ''x'') (N 1)))
+  :   = Suma (N 3) (Suma (V ''x'') (N 1))    
+  : simp_constA (Suma (N 3) (Suma (V ''x'') (N 0))) 
+  :   = Suma (N 3) (Suma (V ''x'') (N 0))
+  La definición es
+  : fun simp_constA :: "expA ⇒ expA" where
+  : "simp_constA (N n) = N n" |
+  : "simp_constA (V x) = V x" |
+  : "simp_constA (Suma a1 a2) =
+  :   (case (simp_constA a1, simp_constA a2) of
+  :     (N n1, N n2) ⇒ N(n1+n2) |
+  :     (b1,b2) ⇒ Suma b1 b2)"
+
++ Prop.: La función ~simp_constA~ es correcta; es decir, conserva el
+  valor de las expresiones aritméticas. 
+  + 1º intento de demostración  
+    : theorem valorA_simp_constA1:
+    :   "valorA (simp_constA a) s = valorA a s"
+    : apply (induction a)
+    : apply auto
+    : oops
+  + Se observa que no ha expandido la expresión ~case~. Para que lo
+    haga, se añade ~split: expA.split~
+  + Demostración:
+    : theorem valorA_simp_constA:
+    :   "valorA (simp_constA a) s = valorA a s"
+    : apply(induction a)
+    : apply (auto split: expA.split)
+    : done
+
++ ~(suma a1 a2)~ es la suma de las expresiones aritmética con
+  propagación de constantes y usando las reglas de simplificación
+  + 0 + a = a
+  + a + 0 = a
+  Por ejemplo, 
+  : suma (V ''x'') (suma (N 3) (N 1)) 
+  :   = Suma (V ''x'') (N 4)" *)
+  : suma (N 3) (suma (V ''x'') (N 1)) 
+  :   = Suma (N 3) (Suma (V ''x'') (N 1))    
+  : suma (N 3) (suma (V ''x'') (N 0)) 
+  :   = Suma (N 3) (V ''x'')
+  La definición es
+  : fun suma :: "expA ⇒ expA ⇒ expA" where
+  : "suma (N i1) (N i2) = N(i1+i2)" |
+  : "suma (N i) a = (if i=0 then a else Suma (N i) a)" |
+  : "suma a (N i) = (if i=0 then a else Suma a (N i))" |
+  : "suma a1 a2 = Suma a1 a2"
+
++ Prop.: La función suma es correcta; es decir, conserva el
+  valor de las expresiones aritméticas.
+  : lemma valorA_suma[simp]:
+  :   "valorA (suma a1 a2) s = valorA a1 s + valorA a2 s"
+  : apply (induction a1 a2 rule: suma.induct)
+  : apply simp_all
+  : done
+
++ ~(simpA e)~ es la expresión aritmética obtenida simplificando e
+  con propagación de constantes y las reglas del elemento neutro. Por
+  ejemplo, 
+  : simpA (Suma (V ''x'') (Suma (N 3) (N 1))) 
+  :   = Suma (V ''x'') (N 4)
+  : simpA (Suma (N 3) (Suma (V ''x'') (N 1))) 
+  :   = Suma (N 3) (Suma (V ''x'') (N 1))    
+  : simpA (Suma (N 3) (Suma (V ''x'') (N 0))) 
+  :   = Suma (N 3) (V ''x'')
+  : simpA (Suma (Suma (N 0) (N 0)) (Suma (V ''x'') (N 0)))
+  :   = V ''x''
+  La definición es
+  : fun simpA :: "expA ⇒ expA" where
+  : "simpA (N n)        = N n" |
+  : "simpA (V x)        = V x" |
+  : "simpA (Suma a1 a2) = suma (simpA a1) (simpA a2)"
+
++ Prop.: La función simpA es correcta; es decir, conserva el
+  valor de las expresiones aritméticas. 
+  : theorem valorA_simpA [simp]:
+  :   "valorA (simpA a) s = valorA a s"
+  : apply (induction a)
+  : apply simp_all
+  : done
+
+* Expresiones booleanas
+
+* Máquina a pila y compilación
