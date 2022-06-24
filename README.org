@@ -1,6 +1,6 @@
 #+TITLE: Semánticas de lenguajes de programación en Isabelle/HOL (SLP)
 #+OPTIONS: toc:nil 
-
+ 
 El presente trabajo es una adaptación del libro de T. Nipkow y G. Klein
 [[http://www.concrete-semantics.org/][Concrete Semantics with Isabelle/HOL]] y su curso [[http://www21.in.tum.de/teaching/semantik/WS1617/][Semantics of Programming
 Languages (2016/17)]] con vista a su uso en la próxima edición del curso de

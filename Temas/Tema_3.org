@@ -6,6 +6,7 @@
    - [[#sintaxis][Sintaxis]]
    - [[#semántica][Semántica]]
    - [[#propagación-de-constantes-][Propagación de constantes ]]
+   - [[#relación-de-ejercicios-ejt3athy][Relación de ejercicios (EjT3A.thy):]]
  - [[#expresiones-booleanas][Expresiones booleanas]]
  - [[#máquina-a-pila-y-compilación][Máquina a pila y compilación]]
 
@@ -151,7 +152,7 @@
   + Demostración:
     : theorem valorA_simp_constA:
     :   "valorA (simp_constA a) s = valorA a s"
-    : apply(induction a)
+    : apply (induction a)
     : apply (auto split: expA.split)
     : done
 
@@ -205,6 +206,8 @@
   : apply (induction a)
   : apply simp_all
   : done
+  
+** Relación de ejercicios ([[../Ejercicios/EjT3A.thy][EjT3A.thy]]):
 
 * Expresiones booleanas
 
